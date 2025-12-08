@@ -1,0 +1,177 @@
+cmake_minimum_required(VERSION 3.10)
+project(qml6_ros2_plugin VERSION 1.0.0)
+set(CMAKE_CXX_STANDARD 17)
+
+#set(CMAKE_BUILD_TYPE "Debug")
+
+option(GLOBAL_INSTALL "Install the plugin globally instead of as a ROS2 overlay." OFF)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(ros_babel_fish REQUIRED)
+find_package(tf2_ros REQUIRED)
+
+find_package(Qt6 COMPONENTS Core Multimedia Qml Quick REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAML_CPP yaml-cpp)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+###########
+## Build ##
+###########
+
+set(SOURCES
+  include/qml6_ros2_plugin/conversion/message_conversions.hpp
+  include/qml6_ros2_plugin/conversion/qml_ros_conversion.hpp
+  include/qml6_ros2_plugin/array.hpp
+  include/qml6_ros2_plugin/action_client.hpp
+  include/qml6_ros2_plugin/ament_index.hpp
+  include/qml6_ros2_plugin/babel_fish_dispenser.hpp
+  include/qml6_ros2_plugin/goal_handle.hpp
+  include/qml6_ros2_plugin/goal_status.hpp
+  include/qml6_ros2_plugin/image_transport_manager.hpp
+  include/qml6_ros2_plugin/image_transport_subscription.hpp
+  include/qml6_ros2_plugin/io.hpp
+  include/qml6_ros2_plugin/logger.hpp
+  include/qml6_ros2_plugin/message_item_model.hpp
+  include/qml6_ros2_plugin/publisher.hpp
+  include/qml6_ros2_plugin/qobject_ros2.hpp
+  include/qml6_ros2_plugin/qos.hpp
+  include/qml6_ros2_plugin/ros2.hpp
+  include/qml6_ros2_plugin/ros2_init_options.hpp
+  include/qml6_ros2_plugin/service_client.hpp
+  include/qml6_ros2_plugin/subscription.hpp
+  include/qml6_ros2_plugin/tf_transform.hpp
+  include/qml6_ros2_plugin/tf_transform_listener.hpp
+  include/qml6_ros2_plugin/topic_info.hpp
+  include/qml6_ros2_plugin/time.hpp
+  src/array.cpp
+  src/action_client.cpp
+  src/ament_index.cpp
+  src/babel_fish_dispenser.cpp
+  src/goal_handle.cpp
+  src/image_transport_manager.cpp
+  src/image_transport_subscription.cpp
+  src/io.cpp
+  src/logger.cpp
+  src/message_conversions.cpp
+  src/message_item_model.cpp
+  src/publisher.cpp
+  src/qml6_ros2_plugin.cpp
+  src/qobject_ros2.cpp
+  src/qos.cpp
+  src/ros2.cpp
+  src/ros2_init_options.cpp
+  src/service_client.cpp
+  src/subscription.cpp
+  src/tf_transform.cpp
+  src/tf_transform_listener.cpp
+)
+
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_compile_definitions(${PROJECT_NAME} PRIVATE RCLCPP_MAJOR_VERSION=${rclcpp_VERSION_MAJOR})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  Qt6::Core Qt6::Multimedia Qt6::Qml Qt6::Quick
+  ${YAML_CPP_LIBRARIES}
+  ament_index_cpp::ament_index_cpp
+  rclcpp::rclcpp
+  image_transport::image_transport
+  ros_babel_fish::ros_babel_fish
+  tf2_ros::tf2_ros
+)
+
+#############
+## Testing ##
+#############
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ros_babel_fish_test_msgs REQUIRED)
+  find_package(example_interfaces REQUIRED)
+  find_package(std_srvs REQUIRED)
+  find_package(Qt6Test REQUIRED)
+
+  set(TEST_DEPENDENCIES ${example_interfaces_TARGETS} ${ros_babel_fish_test_msgs_TARGETS} ${std_srvs_TARGETS})
+
+  ament_add_gtest(test_communication test/communication.cpp)
+  target_link_libraries(test_communication ${PROJECT_NAME} ${TEST_DEPENDENCIES} Qt6::Test)
+
+  ament_add_gtest(test_message_conversions test/message_conversions.cpp)
+  target_link_libraries(test_message_conversions ${PROJECT_NAME} ${TEST_DEPENDENCIES})
+
+  ament_add_gtest(test_ros_life_cycle test/ros_life_cycle.cpp)
+  target_link_libraries(test_ros_life_cycle ${PROJECT_NAME} ${TEST_DEPENDENCIES})
+
+  ament_add_gtest(test_logging test/logging.cpp)
+  target_link_libraries(test_logging ${PROJECT_NAME})
+  #
+  ament_add_gtest(test_io test/io.cpp)
+  target_link_libraries(test_io ${PROJECT_NAME} ${TEST_DEPENDENCIES})
+
+  install(DIRECTORY test/test_io DESTINATION share/qml6_ros2_plugin/test/)
+endif()
+
+# to run: catkin build --this --no-deps -DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -v --catkin-make-args ${PROJECT_NAME}_coverage
+# Path to results overview will be printed in the build process
+# Big thanks to the moveit people from whose docs I've obtained the information on how to get the coverage
+if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
+  find_package(code_coverage REQUIRED)   # catkin package ros-*-code-coverage
+  include(CodeCoverage)
+  append_coverage_compiler_flags()
+  set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/build/*" "*/src/qml6_ros2_plugin.cpp")
+  add_code_coverage(NAME ${PROJECT_NAME}_coverage)
+endif()
+
+#############
+## Install ##
+#############
+
+
+if(${GLOBAL_INSTALL})
+  message(STATUS "Installing plugin globally.")
+  # Install Qml plugin as found here
+  # https://github.com/4rtzel/cmake-qml-plugin-example/issues/1
+  set(URI Ros2)
+  string(REPLACE "." "/" TARGETPATH ${URI})
+  execute_process(COMMAND qmake -qt=qt6 -query QT_INSTALL_QML
+    OUTPUT_VARIABLE QT_INSTALL_QML_RAW)
+  string(REPLACE "\n" "" QT_INSTALL_QML ${QT_INSTALL_QML_RAW})
+  if("${QT_INSTALL_QML}" STREQUAL "**Unknown**")
+    message(FATAL_ERROR "Could not find qml plugin dir. Is qml installed?")
+  endif()
+  message(STATUS "Plugin will be installed to ${QT_INSTALL_QML}")
+  set(DESTDIR "${QT_INSTALL_QML}/${TARGETPATH}")
+  install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME} DESTINATION lib)
+  install(TARGETS ${PROJECT_NAME} DESTINATION ${DESTDIR})
+  install(FILES ${CMAKE_CURRENT_LIST_DIR}/qmldir DESTINATION ${DESTDIR})
+else()
+  message(STATUS "Installing as part of a ROS2 workspace.")
+  # Register plugin to be found by QML
+  ament_environment_hooks(environment_setup.dsv.in)
+  install(DIRECTORY include/ DESTINATION include)
+  install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME} DESTINATION lib)
+  install(TARGETS ${PROJECT_NAME} DESTINATION lib/qml6/Ros2)
+  install(FILES qmldir DESTINATION lib/qml6/Ros2)
+  # The export is only necessary if part of a ROS2 workspace
+  ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+  ament_export_include_directories(include)
+  ament_export_dependencies(ament_index_cpp rclcpp image_transport ros_babel_fish tf2_ros Qt6Core Qt6Qml Qt6Quick Qt6Multimedia)
+endif()
+
+
+ament_package()

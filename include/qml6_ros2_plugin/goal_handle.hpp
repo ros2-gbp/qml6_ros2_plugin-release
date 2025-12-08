@@ -1,0 +1,68 @@
+// Copyright (c) 2021 Stefan Fabian. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#ifndef QML_ROS2_PLUGIN_GOAL_HANDLE_HPP
+#define QML_ROS2_PLUGIN_GOAL_HANDLE_HPP
+
+#include "qml6_ros2_plugin/goal_status.hpp"
+#include "qml6_ros2_plugin/qobject_ros2.hpp"
+#include "qml6_ros2_plugin/time.hpp"
+
+#include <QTimer>
+#include <ros_babel_fish/babel_fish.hpp>
+
+namespace qml6_ros2_plugin
+{
+
+class GoalHandle : public QObjectRos2
+{
+  Q_OBJECT
+  //! The goal status in form of an action_goal_status enum value:
+  //! Aborted, Accepted, Canceled, Canceling, Executing, Succeeded, Unknown
+  Q_PROPERTY( qml6_ros2_plugin::action_goal_status::GoalStatus status READ status NOTIFY statusChanged )
+  //! The uuid of the goal.
+  Q_PROPERTY( QString goalId READ goalId )
+  //! The time stamp of when the goal was accepted.
+  Q_PROPERTY( qml6_ros2_plugin::Time goalStamp READ goalStamp )
+  //! True if the goal is in an active state (Accepted or Executing), false if not.
+  Q_PROPERTY( bool isActive READ isActive NOTIFY statusChanged )
+public:
+  GoalHandle( ros_babel_fish::BabelFishActionClient::SharedPtr client,
+              ros_babel_fish::BabelFishActionClient::GoalHandle::SharedPtr handle );
+
+  GoalHandle( ros_babel_fish::BabelFishActionClient::SharedPtr client,
+              std::shared_future<ros_babel_fish::BabelFishActionClient::GoalHandle::SharedPtr> handle );
+
+  qml6_ros2_plugin::action_goal_status::GoalStatus status() const;
+
+  QString goalId() const;
+
+  qml6_ros2_plugin::Time goalStamp() const;
+
+  bool isActive() const;
+
+  //! Sends a cancellation request to the ActionServer.
+  Q_INVOKABLE void cancel();
+
+signals:
+  void statusChanged( qml6_ros2_plugin::action_goal_status::GoalStatus status );
+
+protected:
+  void onRos2Shutdown() override;
+
+private:
+  void checkFuture() const;
+
+  void updateStatus();
+
+  QTimer status_timer_;
+  ros_babel_fish::BabelFish babel_fish_;
+  // Store the client to make sure its destructed after the goal handles
+  ros_babel_fish::BabelFishActionClient::SharedPtr client_;
+  mutable ros_babel_fish::BabelFishActionClient::GoalHandle::SharedPtr goal_handle_;
+  mutable std::shared_future<ros_babel_fish::BabelFishActionClient::GoalHandle::SharedPtr> goal_handle_future_;
+  action_goal_status::GoalStatus status_ = action_goal_status::Unknown;
+};
+} // namespace qml6_ros2_plugin
+
+#endif // QML_ROS2_PLUGIN_GOAL_HANDLE_HPP

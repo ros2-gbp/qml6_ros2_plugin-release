@@ -1,0 +1,66 @@
+========
+Examples
+========
+
+You can find the described example QML files in the
+`qml6_ros2_plugin repo examples directory <https://github.com/StefanFabian/qml6_ros2_plugin/tree/master/examples>`_.
+
+Subscription
+==========
+
+The subscriber example demonstrates how to create a ``Subscription`` in QML
+using the *QML ROS Plugin*.
+
+You can run the example using the ``qmlscene`` executable:
+
+.. code-block::
+
+  qmlscene subscription.qml
+
+Publisher
+=========
+
+The publisher example publishes an ``example_interfaces/msg/Int32`` message on the topic that
+the subscriber example subscribes to.
+Coincidentally, the two examples can very well be used together.
+
+To run, run:
+
+.. code-block::
+
+  qmlscene -qt=qt6 publisher.qml
+
+URDF Tutorial UI
+================
+
+This example combines several of the functionalities provided by this library
+and presents a user interface for the ``urdf_sim_tutorial`` diff drive example.
+
+First, launch the example:
+
+.. code-block::
+
+  roslaunch -qt=qt6 urdf_sim_tutorial 13-diffdrive.launch
+
+Next, launch the example UI:
+
+.. code-block::
+
+  qmlscene -qt=qt6 urdf_tutorial_combined.qml
+
+It provides a top down view on the position of the robot and sliders to control
+the forward and angular movement.
+
+Logging
+=======
+
+This example demonstrates the logging functionality detailed in :ref:`Logging`.
+The "Output logging level" sets the minimum logging level that is printed whereas the
+"Message logging level" sets the level of the message that is logged when you click
+the `Log` button.
+
+To run, run:
+
+.. code-block::
+
+  qmlscene -qt=qt6 logging.qml
