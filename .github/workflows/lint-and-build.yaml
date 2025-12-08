@@ -1,9 +1,9 @@
 name: Build & Test
 on:
   push:
-    branches: [ rolling ]
+    branches: [ jazzy ]
   pull_request:
-    branches: [ rolling ]
+    branches: [ jazzy ]
 defaults:
   run:
     shell: bash
@@ -37,7 +37,7 @@ jobs:
     strategy:
       matrix:
         setup:
-          - rosdistro: rolling
+          - rosdistro: jazzy
             os: ubuntu-latest
     steps:
       - name: install build tools
