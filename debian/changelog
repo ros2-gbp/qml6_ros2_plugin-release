@@ -1,0 +1,16 @@
+ros-humble-qml6-ros2-plugin (0.25.121-1jammy) jammy; urgency=high
+
+  * Added encoding information to ImageTransportSubscription and fixed conversion from float to Y16.
+    In accordance with depth image standards in ROS 16UC1 is interpreted as mm whereas float is in m. The conversion now respects that.
+  * Contributors: Stefan Fabian
+
+ -- Stefan Fabian <qml6_ros2_plugin@stefanfabian.me>  Fri, 12 Dec 2025 00:00:00 -0000
+
+ros-humble-qml6-ros2-plugin (0.25.120-1jammy) jammy; urgency=high
+
+  * Initial release.
+  * Contributors: Stefan Fabian
+
+ -- Stefan Fabian <qml6_ros2_plugin@stefanfabian.me>  Mon, 08 Dec 2025 00:00:00 -0000
+
+
