@@ -1,9 +1,9 @@
 name: Build & Test
 on:
   push:
-    branches: [ jazzy ]
+    branches: [ kilted ]
   pull_request:
-    branches: [ jazzy ]
+    branches: [ kilted ]
 defaults:
   run:
     shell: bash
@@ -37,8 +37,8 @@ jobs:
     strategy:
       matrix:
         setup:
-          - rosdistro: jazzy
-            os: ubuntu-latest
+          - rosdistro: kilted
+            os: ubuntu-24.04
     steps:
       - name: install build tools
         run: |
