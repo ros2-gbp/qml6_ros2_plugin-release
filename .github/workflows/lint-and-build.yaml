@@ -1,9 +1,9 @@
 name: Build & Test
 on:
   push:
-    branches: [ kilted ]
+    branches: [ rolling ]
   pull_request:
-    branches: [ kilted ]
+    branches: [ rolling ]
 defaults:
   run:
     shell: bash
@@ -37,8 +37,8 @@ jobs:
     strategy:
       matrix:
         setup:
-          - rosdistro: kilted
-            os: ubuntu-24.04
+          - rosdistro: rolling
+            os: ubuntu-latest
     steps:
       - name: install build tools
         run: |
