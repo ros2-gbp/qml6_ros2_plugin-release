@@ -102,7 +102,9 @@ void Ros2Qml::init( const QString &name, const QStringList &argv, Ros2InitOption
   executor_options.context = context_;
   // StaticSingleThreadedExecutor may be a bit faster but will keep a reference to the subscription
   // and therefore not unsubscribe if the subscription is reset.
-  auto executor = rclcpp::experimental::executors::EventsExecutor::make_unique( executor_options );
+  auto queue = std::make_unique<rclcpp::experimental::executors::SimpleEventsQueue>();
+  auto executor = rclcpp::experimental::executors::EventsExecutor::make_unique(
+      std::move( queue ), false, executor_options );
   executor->add_node( node_ );
   emit initialized();
 
@@ -648,7 +650,12 @@ bool Ros2QmlSingletonWrapper::initLogging()
     QML_ROS2_PLUGIN_ERROR( "You need to initialize Ros2 before calling a log function!" );
     return false;
   }
-  logger_ = qjsEngine( this )->newQObject( new Logger( node->get_logger() ) );
+  QJSEngine *engine = qjsEngine( this );
+  if ( !engine ) {
+    QML_ROS2_PLUGIN_ERROR( "Failed to get QJSEngine in initLogging. Can not create logger." );
+    return false;
+  }
+  logger_ = engine->newQObject( new Logger( node->get_logger() ) );
   return true;
 }
 } // namespace qml6_ros2_plugin
