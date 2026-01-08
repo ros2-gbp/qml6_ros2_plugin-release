@@ -114,6 +114,9 @@ int ServiceClient::pendingRequests() const { return pending_requests_; }
 
 void ServiceClient::sendRequestAsync( const QVariantMap &req, const QJSValue &callback )
 {
+  if ( !engine_ ) {
+    engine_ = qjsEngine( this );
+  }
   pending_requests_++;
   if ( !isServiceReady() ) {
     QML_ROS2_PLUGIN_DEBUG( "Service '%s' not ready, waiting up to %d ms.",
@@ -132,15 +135,19 @@ void ServiceClient::sendRequestAsync( const QVariantMap &req, const QJSValue &ca
   try {
     message = babel_fish_.create_service_request_shared( service_type_.toStdString() );
     fillMessage( *message, req );
-    client_->async_send_request( message, [callback,
-                                           this]( BabelFishServiceClient::SharedFuture response ) {
-      QML_ROS2_PLUGIN_DEBUG( "Received response from service %s.", name_.toStdString().c_str() );
-      pending_requests_--;
-      emit pendingRequestsChanged();
-      QMetaObject::invokeMethod( this, "invokeCallback", Qt::AutoConnection,
-                                 Q_ARG( QJSValue, callback ),
-                                 Q_ARG( QVariant, msgToMap( response.get() ) ) );
-    } );
+    QPointer instance = this;
+    client_->async_send_request(
+        message, [callback, instance]( BabelFishServiceClient::SharedFuture response ) {
+          if ( !instance )
+            return;
+          QML_ROS2_PLUGIN_DEBUG( "Received response from service %s.",
+                                 instance->name_.toStdString().c_str() );
+          instance->pending_requests_--;
+          emit instance->pendingRequestsChanged();
+          QMetaObject::invokeMethod( instance, "invokeCallback", Qt::AutoConnection,
+                                     Q_ARG( QJSValue, callback ),
+                                     Q_ARG( QVariant, msgToMap( response.get() ) ) );
+        } );
     emit pendingRequestsChanged();
     return;
   } catch ( BabelFishException &ex ) {
@@ -157,7 +164,12 @@ void ServiceClient::sendRequestAsync( const QVariantMap &req, const QJSValue &ca
 
 void ServiceClient::invokeCallback( QJSValue value, const QVariant &result )
 {
-  QJSEngine *engine = qjsEngine( this );
+  QJSEngine *engine = engine_ ? engine_.get() : qjsEngine( this );
+  if ( !engine ) {
+    QML_ROS2_PLUGIN_ERROR(
+        "ServiceClient: Failed to get QJSEngine in invokeCallback. Can not invoke callback." );
+    return;
+  }
   value.call( { engine->toScriptValue( result ) } );
 }
 } // namespace qml6_ros2_plugin
