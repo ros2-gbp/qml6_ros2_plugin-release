@@ -102,7 +102,7 @@ void Ros2Qml::init( const QString &name, const QStringList &argv, Ros2InitOption
   executor_options.context = context_;
   // StaticSingleThreadedExecutor may be a bit faster but will keep a reference to the subscription
   // and therefore not unsubscribe if the subscription is reset.
-  auto executor = rclcpp::experimental::executors::EventsExecutor::make_unique( executor_options );
+  auto executor = rclcpp::executors::SingleThreadedExecutor::make_unique( executor_options );
   executor->add_node( node_ );
   emit initialized();
 
@@ -378,10 +378,6 @@ QObject *Ros2QmlSingletonWrapper::createInitOptions() { return new Ros2InitOptio
 
 QoSWrapper Ros2QmlSingletonWrapper::QoS() { return {}; }
 
-QoSWrapper Ros2QmlSingletonWrapper::BestAvailableQoS()
-{
-  return QoSWrapper( rclcpp::BestAvailableQoS() );
-}
 QoSWrapper Ros2QmlSingletonWrapper::ClockQoS() { return QoSWrapper( rclcpp::ClockQoS() ); }
 
 QoSWrapper Ros2QmlSingletonWrapper::SensorDataQoS()
