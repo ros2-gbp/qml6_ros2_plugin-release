@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>qml6_ros2_plugin</name>
-  <version>0.26.30</version>
+  <version>0.26.31</version>
   <description>
     A QML plugin for ROS.
     Enables full communication with ROS from QML.
@@ -27,6 +27,9 @@
   <build_depend>qt6-base-dev</build_depend>
   <build_depend>qt6-declarative-dev</build_depend>
   <build_depend>qt6-multimedia-dev</build_depend>
+  <build_export_depend>qt6-base-dev</build_export_depend>
+  <build_export_depend>qt6-declarative-dev</build_export_depend>
+  <build_export_depend>qt6-multimedia-dev</build_export_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>example_interfaces</test_depend>
