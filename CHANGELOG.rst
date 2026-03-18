@@ -2,6 +2,11 @@
 Changelog for package qml6_ros2_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.26.30 (2026-03-18)
+--------------------
+* Added missing build export depends.
+* Contributors: Stefan Fabian
+
 3.26.30 (2026-03-09)
 --------------------
 * Fix yaml conversion not handling QJSValue correctly.
