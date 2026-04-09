@@ -1,9 +1,9 @@
 name: Build & Test
 on:
   push:
-    branches: [ kilted ]
+    branches: [ rolling ]
   pull_request:
-    branches: [ kilted ]
+    branches: [ rolling ]
 defaults:
   run:
     shell: bash
@@ -37,13 +37,14 @@ jobs:
     strategy:
       matrix:
         setup:
-          - rosdistro: kilted
+          - rosdistro: rolling
             os: ubuntu-24.04
     steps:
-      - name: install build tools
+      - name: install build tools and latest testing repo
         run: |
           sudo apt-get update
-          sudo apt-get install -y ros-dev-tools
+          sudo apt-get install -y ros-dev-tools ros2-testing-apt-source
+          sudo apt-get update
       - uses: actions/checkout@v4
         with:
           path: src/qml6_ros2_plugin

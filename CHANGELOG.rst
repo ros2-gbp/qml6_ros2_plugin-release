@@ -2,12 +2,20 @@
 Changelog for package qml6_ros2_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.26.31 (2026-03-18)
+4.26.40 (2026-04-09)
+--------------------
+* Improved robustness of image transport property change handling. (`#38 <https://github.com/StefanFabian/qml6_ros2_plugin/issues/38>`_)
+  * Improved robustness of image transport property change handling.
+  Properly reset old properties when topic or transport is changed.
+  * Fix no image timer not being started if subscription was reset.
+* Contributors: Stefan Fabian
+
+4.26.30 (2026-03-18)
 --------------------
 * Added missing build export depends.
 * Contributors: Stefan Fabian
 
-2.26.30 (2026-03-09)
+3.26.30 (2026-03-09)
 --------------------
 * Fix yaml conversion not handling QJSValue correctly.
 * Updated documentation.
@@ -26,15 +34,10 @@ Changelog for package qml6_ros2_plugin
   Use QPointer for callbacks to prevent crashes due to the object being destroyed while an asynchronous operation is still in progress.
 * Contributors: Stefan Fabian
 
-2.25.122 (2025-12-12)
+3.25.121 (2025-12-12)
 ---------------------
 * Added encoding information to ImageTransportSubscription and fixed conversion from float to Y16.
   In accordance with depth image standards in ROS 16UC1 is interpreted as mm whereas float is in m. The conversion now respects that.
-* Contributors: Stefan Fabian
-
-2.25.121 (2025-12-08)
----------------------
-* Backport for kilted.
 * Contributors: Stefan Fabian
 
 2.25.120 (2025-12-08)
