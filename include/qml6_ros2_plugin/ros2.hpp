@@ -163,6 +163,8 @@ public:
 
   std::shared_ptr<rclcpp::Node> node();
 
+  std::shared_ptr<rclcpp::Context> context() const;
+
 signals:
 
   //! Emitted once when ROS was initialized.
@@ -219,7 +221,7 @@ public:
   //! Creates a QoS wrapper with the settings for SystemDefaults from rclcpp.
   Q_INVOKABLE qml6_ros2_plugin::QoSWrapper SystemDefaultsQoS();
 
-  //! @copydoc Ros2Qml::isRosInitialized
+  //! @copydoc Ros2Qml::isInitialized
   Q_INVOKABLE bool isInitialized() const;
 
   //! @copydoc Ros2Qml::init(const QString &, Ros2InitOptions)
@@ -332,10 +334,10 @@ public:
                                         quint32 queue_size = 10 );
 
   /*!
-   * Creates a Subscriber to createSubscription to ROS messages.
+   * Creates a Subscriber to subscribe to ROS messages.
    * Convenience function to create a subscriber in a single line.
    *
-   * @param topic The topic to createSubscription to.
+   * @param topic The topic to subscribe to.
    * @param qos The QoS settings for the subscription.
    * @return A Subscriber instance.
    */
@@ -349,10 +351,10 @@ public:
   Q_INVOKABLE QObject *createSubscription( const QString &topic, quint32 queue_size = 1 );
 
   /*!
-   * Creates a Subscriber to createSubscription to ROS messages.
+   * Creates a Subscriber to subscribe to ROS messages.
    * Convenience function to create a subscriber in a single line.
    *
-   * @param topic The topic to createSubscription to.
+   * @param topic The topic to subscribe to.
    * @param message_type The type of the messages to subscribe to on the topic.
    * @param queue_size The maximum number of incoming messages to be queued for processing.
    * @return A Subscriber instance.
