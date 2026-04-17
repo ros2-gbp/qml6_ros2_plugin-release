@@ -2,30 +2,27 @@
 Changelog for package qml6_ros2_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4.26.41 (2026-04-17)
+2.26.40 (2026-04-17)
 --------------------
 * Added bandwidth and frequency to Subscription. (`#50 <https://github.com/StefanFabian/qml6_ros2_plugin/issues/50>`_)
   * Added bandwidth and frequency to Subscription. Refactored logic for computation affecting TfBuffer as well.
 * Ensure tf transform is always updated when target or source frame changes.
 * Added TfBuffer element with namespaced tf support (`#42 <https://github.com/StefanFabian/qml6_ros2_plugin/issues/42>`_)
   * Added TfBuffer to be able to get transforms from namespaced tf and additional information such as frame info.
-* Fix deprecation warnings during build due to interface changes in ament_index_cpp version 1.13.2.
-* Contributors: Stefan Fabian
-
-4.26.40 (2026-04-09)
---------------------
 * Improved robustness of image transport property change handling. (`#38 <https://github.com/StefanFabian/qml6_ros2_plugin/issues/38>`_)
   * Improved robustness of image transport property change handling.
   Properly reset old properties when topic or transport is changed.
   * Fix no image timer not being started if subscription was reset.
+* Switch to ros2 testing sources for CI to get newest packages.
+* Small documentation fixes.
 * Contributors: Stefan Fabian
 
-4.26.30 (2026-03-18)
+2.26.31 (2026-03-18)
 --------------------
 * Added missing build export depends.
 * Contributors: Stefan Fabian
 
-3.26.30 (2026-03-09)
+2.26.30 (2026-03-09)
 --------------------
 * Fix yaml conversion not handling QJSValue correctly.
 * Updated documentation.
@@ -44,10 +41,15 @@ Changelog for package qml6_ros2_plugin
   Use QPointer for callbacks to prevent crashes due to the object being destroyed while an asynchronous operation is still in progress.
 * Contributors: Stefan Fabian
 
-3.25.121 (2025-12-12)
+2.25.122 (2025-12-12)
 ---------------------
 * Added encoding information to ImageTransportSubscription and fixed conversion from float to Y16.
   In accordance with depth image standards in ROS 16UC1 is interpreted as mm whereas float is in m. The conversion now respects that.
+* Contributors: Stefan Fabian
+
+2.25.121 (2025-12-08)
+---------------------
+* Backport for kilted.
 * Contributors: Stefan Fabian
 
 2.25.120 (2025-12-08)
