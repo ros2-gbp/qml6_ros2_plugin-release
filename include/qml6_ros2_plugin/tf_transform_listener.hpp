@@ -9,7 +9,7 @@
 
 #include <QDateTime>
 #include <memory>
-#include <tf2_ros/buffer.hpp>
+#include <tf2_ros/buffer.h>
 
 namespace qml6_ros2_plugin
 {
