@@ -286,6 +286,44 @@ TEST( Communication, throttleRate )
   delete subscriber_pns;
 }
 
+TEST( Communication, subscriptionTelemetry )
+{
+  Ros2QmlSingletonWrapper wrapper;
+  auto pub = node->create_publisher<std_msgs::msg::Int32>( "~/test_telemetry", rclcpp::QoS( 20 ) );
+  auto subscriber = dynamic_cast<qml6_ros2_plugin::Subscription *>(
+      wrapper.createSubscription( "/communication/test_telemetry", 20 ) );
+  subscriber->setThrottleRate( 0 );
+  processEvents();
+
+  ASSERT_TRUE( waitFor( [&]() { return pub->get_subscription_count() > 0; }, 3s ) )
+      << "Timeout while waiting for telemetry subscriber to connect.";
+
+  std_msgs::msg::Int32 msg;
+  // Publish with approx 100Hz and 400 bytes/s (int32 is 4 bytes, so 100 messages/s is 400 bytes/s)
+  for ( int i = 0; i < 30; ++i ) {
+    msg.data = i;
+    pub->publish( msg );
+    processEvents();
+    std::this_thread::sleep_for( 10ms );
+  }
+
+  ASSERT_TRUE( waitFor(
+      [&]() { return subscriber->frequency() > 90.0f && subscriber->bandwidth() > 350.0f; }, 3s ) )
+      << "Telemetry did not rise as expected. Frequency: " << subscriber->frequency()
+      << ", bandwidth: " << subscriber->bandwidth();
+
+  std::this_thread::sleep_for( 40ms );
+  processEvents();
+  EXPECT_GT( subscriber->frequency(), 50.0f );
+
+  ASSERT_TRUE( waitFor(
+      [&]() { return subscriber->frequency() < 0.1f && subscriber->bandwidth() < 1.0f; }, 4s ) )
+      << "Telemetry did not decay to zero. Frequency: " << subscriber->frequency()
+      << ", bandwidth: " << subscriber->bandwidth();
+
+  delete subscriber;
+}
+
 TEST( Communication, queryTopics )
 {
   auto pub1 = node->create_publisher<geometry_msgs::msg::Pose>( "/query_topics/pose1", 10 );
@@ -701,6 +739,14 @@ TEST( Communication, tfTransform )
   EXPECT_NEAR( transform.rotation().toMap()["y"].toDouble(), 0.48208547, 1E-6 );
   EXPECT_NEAR( transform.rotation().toMap()["z"].toDouble(), -0.22809313, 1E-6 );
 
+  // Regression test: re-selecting a previously valid target frame should recover validity even
+  // if the transform contents are unchanged.
+  transform.setTargetFrame( "does_not_exist" );
+  ASSERT_TRUE( waitFor( [&]() { return !transform.valid(); } ) );
+  transform.setTargetFrame( "world" );
+  ASSERT_TRUE( waitFor( [&]() { return transform.valid(); } ) )
+      << "TfTransform did not recover validity when switching back to a valid frame pair";
+
   transform.setEnabled( false );
   EXPECT_FALSE( transform.enabled() );
   QCoreApplication::processEvents();
@@ -844,6 +890,7 @@ int main( int argc, char **argv )
   int result = RUN_ALL_TESTS();
   node.reset();
   wrapper.shutdown();
+  rclcpp::shutdown();
   return result;
 }
 
