@@ -11,11 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.BACKPORT_PAT }}
+      - uses: actions/checkout@v4
       - name: Create backport pull request
-        uses: korthout/backport-action@v4.3.0
+        uses: korthout/backport-action@v4
         with:
           github_token: '${{ secrets.BACKPORT_PAT }}'
