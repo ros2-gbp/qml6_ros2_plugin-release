@@ -1,3 +1,26 @@
+## qml6_ros2_plugin (kilted) - 2.26.41-1
+
+The packages in the `qml6_ros2_plugin` repository were released into the `kilted` distro by running `/usr/bin/bloom-release --rosdistro kilted qml6_ros2_plugin` on `Sat, 18 Apr 2026 14:27:23 -0000`
+
+The `qml6_ros2_plugin` package was released.
+
+Version of package(s) in repository `qml6_ros2_plugin`:
+
+- upstream repository: https://github.com/StefanFabian/qml6_ros2_plugin.git
+- release repository: https://github.com/ros2-gbp/qml6_ros2_plugin-release.git
+- rosdistro version: `2.26.31-1`
+- old version: `2.26.40-1`
+- new version: `2.26.41-1`
+
+Versions of tools used:
+
+- bloom version: `0.13.0`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## qml6_ros2_plugin (jazzy) - 1.26.41-1
 
 The packages in the `qml6_ros2_plugin` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release --rosdistro jazzy qml6_ros2_plugin` on `Sat, 18 Apr 2026 14:22:52 -0000`
