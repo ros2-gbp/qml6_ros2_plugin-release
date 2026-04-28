@@ -104,5 +104,4 @@ tracks:
     ros_distro: rolling
     vcs_type: git
     vcs_uri: https://github.com/StefanFabian/qml6_ros2_plugin.git
-    version: 4.26.42
-    version_saved: :{auto}
+    version: :{auto}
